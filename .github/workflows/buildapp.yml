@@ -164,8 +164,8 @@ jobs:
           # 4. 自動打補丁：修復 YTVideoOverlay 模組 Logos 編譯器 Bug (缺少右括號)
           find Tweaks/YTVideoOverlay -name "Tweak.x" -exec sed -i '' -E 's/return topControls\(self, (%orig.*)\);/id temp = \1; return topControls(self, temp);/g' {} +
           
-          # 5. 自動打補丁：修復 YouTube-X 模組 Logos 編譯器 Bug (無法解析 %orig(nil))
-          find Tweaks/YouTube-X -name "Tweak.x" -exec sed -i '' 's/- (void)decorateContext:(id)context { %orig(nil); }/- (void)decorateContext:(id)context { context = nil; %orig; }/g' {} +
+          # 5. 自動打補丁：修復 YouTube-X 模組 Logos 編譯器 Bug (加入 return; 避免右括號被吃掉)
+          find Tweaks/YouTube-X -name "Tweak.x" -exec sed -i '' 's/- (void)decorateContext:(id)context { %orig(nil); }/- (void)decorateContext:(id)context { context = nil; %orig; return; }/g' {} +
 
           # 6. 開啟寬容模式並進行編譯
           export GO_EASY_ON_ME=1
