@@ -170,13 +170,11 @@ jobs:
           # 6. 自動打補丁：修復 uYouPlus 主程式第 166 行
           sed -i '' 's/return IS_ENABLED(kHideCC) ? %orig(NO) : %orig;/BOOL cc = arg1; if(IS_ENABLED(kHideCC)) cc = NO; return %orig(cc);/g' Sources/uYouPlus.xm
           
-          # 7. 自動打補丁：修復 uYouPlus 主程式第 300 行 (%orig(0) 錯誤)
+          # 7. 自動打補丁：修復 uYouPlus 主程式第 300 行
           sed -i '' 's/- (void)setFeedHeaderScrollMode:(int)arg1 { %orig(0); }/- (void)setFeedHeaderScrollMode:(int)arg1 { arg1 = 0; %orig; }/g' Sources/uYouPlus.xm
-
-          # 8. 印出 uYouPlusThemes.xm 的錯誤行數原始碼，讓我們看清下一個魔王真面目！
-          echo "========== uYouPlusThemes.xm (Line 120 - 140) =========="
-          cat -n Sources/uYouPlusThemes.xm | sed -n '120,140p'
-          echo "======================================================"
+          
+          # 8. 自動打補丁：修復 uYouPlus 主題設定第 129 行
+          sed -i '' 's/return IS_DARK_APPEARANCE_ENABLED ? %orig(\[UIColor blackColor\]) : %orig;/if(IS_DARK_APPEARANCE_ENABLED) color = \[UIColor blackColor\]; return %orig(color);/g' Sources/uYouPlusThemes.xm
 
           # 9. 開啟寬容模式並進行編譯
           export GO_EASY_ON_ME=1
