@@ -167,10 +167,8 @@ jobs:
           # 5. 自動打補丁：修復 YouTube-X 模組
           find Tweaks/YouTube-X -name "Tweak.x" -exec perl -pi -e 's/.*decorateContext.*%orig\(nil\).*/- (void)decorateContext:(id)context {\n    context = nil;\n    %orig;\n}/' {} +
 
-          # 6. 印出 uYouPlus.xm 的錯誤行數原始碼，讓我們看清魔王真面目！
-          echo "========== uYouPlus.xm (Line 155 - 175) =========="
-          cat -n Sources/uYouPlus.xm | sed -n '155,175p'
-          echo "======================================================"
+          # 6. 自動打補丁 (魔王關)：修復 uYouPlus 主程式，將三元運算子展開為 if-else
+          find Sources -name "uYouPlus.xm" -exec perl -pi -e 's/return IS_ENABLED\(kHideCC\)\s*\?\s*%orig\(NO\)\s*:\s*%orig;/BOOL temp = NO; if (IS_ENABLED(kHideCC)) { return %orig(temp); } else { return %orig; }/g' {} +
 
           # 7. 開啟寬容模式並進行編譯
           export GO_EASY_ON_ME=1
