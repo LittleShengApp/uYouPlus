@@ -178,11 +178,9 @@ jobs:
 
           # 9. 自動打補丁：修復 uYouPlus 主題設定第 212 與 218 行
           sed -i '' 's/return IS_DARK_APPEARANCE_ENABLED ? %orig(raisedColor) : %orig;/if(IS_DARK_APPEARANCE_ENABLED) color = raisedColor; return %orig(color);/g' Sources/uYouPlusThemes.xm
-
-          # 10. 印出 uYouPlusThemes.xm 第 277 行附近的原始碼，抓出最後的魔王！
-          echo "========== uYouPlusThemes.xm (Line 270 - 290) =========="
-          cat -n Sources/uYouPlusThemes.xm | sed -n '270,290p'
-          echo "======================================================"
+          
+          # 10. 自動打補丁：修復 uYouPlus 主題設定第 277 行 (%orig(NO) 錯誤)
+          sed -i '' 's/- (void)setLightKeyboard:(BOOL)arg1 { %orig(NO); }/- (void)setLightKeyboard:(BOOL)arg1 { arg1 = NO; %orig; }/g' Sources/uYouPlusThemes.xm
 
           # 11. 開啟寬容模式並進行編譯
           export GO_EASY_ON_ME=1
