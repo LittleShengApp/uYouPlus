@@ -164,7 +164,12 @@ jobs:
           # 4. 自動打補丁：修復 YTVideoOverlay 模組的相同 Logos 編譯器 Bug
           find Tweaks/YTVideoOverlay -name "Tweak.x" -exec sed -i '' -E 's/return topControls\(self, (%orig.*)\);/id temp = \1; return topControls(self, temp);/g' {} +
           
-          # 5. 開啟寬容模式並進行編譯
+          # 5. 印出 YouTube-X 的錯誤行數原始碼，讓我們診斷！
+          echo "========== YouTube-X Tweak.x (Line 75 - 95) =========="
+          cat -n Tweaks/YouTube-X/Tweak.x | sed -n '75,95p'
+          echo "======================================================"
+
+          # 6. 開啟寬容模式並進行編譯
           export GO_EASY_ON_ME=1
           make package THEOS_PACKAGE_SCHEME=rootless IPA=Payload/YouTube.app FINALPACKAGE=1 ADDITIONAL_CFLAGS="-Wno-error -Wno-incompatible-pointer-types -I$(pwd)/headers"
           
