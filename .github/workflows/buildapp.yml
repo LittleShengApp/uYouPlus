@@ -158,16 +158,14 @@ jobs:
           # 2. 自動打補丁：修復 Return-YouTube-Dislikes 模組 (加入缺失的 Foundation 與 assert.h)
           find Tweaks/Return-YouTube-Dislikes -type f \( -name "*.x" -o -name "*.xm" -o -name "*.m" \) -exec sh -c 'printf "#import <Foundation/Foundation.h>\n#include <assert.h>\n" | cat - "$1" > "$1.tmp" && mv "$1.tmp" "$1"' _ {} \;
           
-          # 3. 自動打補丁：修復 YouPiP 模組 Logos 編譯器 Bug (使用正則表達式精準捕捉帶參數的 %orig)
+          # 3. 自動打補丁：修復 YouPiP 模組 Logos 編譯器 Bug (缺少右括號)
           find Tweaks/YouPiP -name "LegacyPiPCompat.x" -exec sed -i '' -E 's/return initPlayerPiPControllerIfNeeded\((%orig.*)\);/id temp = \1; return initPlayerPiPControllerIfNeeded(temp);/g' {} +
           
-          # 4. 自動打補丁：修復 YTVideoOverlay 模組的相同 Logos 編譯器 Bug
+          # 4. 自動打補丁：修復 YTVideoOverlay 模組 Logos 編譯器 Bug (缺少右括號)
           find Tweaks/YTVideoOverlay -name "Tweak.x" -exec sed -i '' -E 's/return topControls\(self, (%orig.*)\);/id temp = \1; return topControls(self, temp);/g' {} +
           
-          # 5. 印出 YouTube-X 的錯誤行數原始碼，讓我們診斷！
-          echo "========== YouTube-X Tweak.x (Line 75 - 95) =========="
-          cat -n Tweaks/YouTube-X/Tweak.x | sed -n '75,95p'
-          echo "======================================================"
+          # 5. 自動打補丁：修復 YouTube-X 模組 Logos 編譯器 Bug (無法解析 %orig(nil))
+          find Tweaks/YouTube-X -name "Tweak.x" -exec sed -i '' 's/- (void)decorateContext:(id)context { %orig(nil); }/- (void)decorateContext:(id)context { context = nil; %orig; }/g' {} +
 
           # 6. 開啟寬容模式並進行編譯
           export GO_EASY_ON_ME=1
