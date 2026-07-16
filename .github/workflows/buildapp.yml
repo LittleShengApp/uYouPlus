@@ -182,7 +182,10 @@ jobs:
           # 10. 自動打補丁：修復 uYouPlus 主題設定第 277 行 (%orig(NO) 錯誤)
           sed -i '' 's/- (void)setLightKeyboard:(BOOL)arg1 { %orig(NO); }/- (void)setLightKeyboard:(BOOL)arg1 { arg1 = NO; %orig; }/g' Sources/uYouPlusThemes.xm
 
-          # 11. 開啟寬容模式並進行編譯
+          # 11. 全局打補丁 (終極防護)：解決 Logos 貪婪吃右大括號的 Bug (強制將同一行的 %orig; 與 } 換行隔開)
+          find . -type f \( -name "*.x" -o -name "*.xm" \) -exec perl -pi -e 's/(%orig[^;]*;\s*)\}/$1\n\}/g' {} +
+
+          # 12. 開啟寬容模式並進行編譯
           export GO_EASY_ON_ME=1
           make package THEOS_PACKAGE_SCHEME=rootless IPA=Payload/YouTube.app FINALPACKAGE=1 ADDITIONAL_CFLAGS="-Wno-error -Wno-incompatible-pointer-types -I$(pwd)/headers"
           
