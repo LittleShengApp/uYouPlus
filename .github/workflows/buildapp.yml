@@ -167,10 +167,15 @@ jobs:
           # 5. 自動打補丁：修復 YouTube-X 模組
           find Tweaks/YouTube-X -name "Tweak.x" -exec perl -pi -e 's/.*decorateContext.*%orig\(nil\).*/- (void)decorateContext:(id)context {\n    context = nil;\n    %orig;\n}/' {} +
 
-          # 6. 自動打補丁 (魔王關)：修復 uYouPlus 主程式，完美避開三元運算子與 %orig(NO) 的解析錯誤
+          # 6. 自動打補丁：修復 uYouPlus 主程式第 166 行
           sed -i '' 's/return IS_ENABLED(kHideCC) ? %orig(NO) : %orig;/BOOL cc = arg1; if(IS_ENABLED(kHideCC)) cc = NO; return %orig(cc);/g' Sources/uYouPlus.xm
 
-          # 7. 開啟寬容模式並進行編譯
+          # 7. 印出 uYouPlus.xm 的錯誤行數原始碼，讓我們看清下一個魔王真面目！
+          echo "========== uYouPlus.xm (Line 290 - 310) =========="
+          cat -n Sources/uYouPlus.xm | sed -n '290,310p'
+          echo "======================================================"
+
+          # 8. 開啟寬容模式並進行編譯
           export GO_EASY_ON_ME=1
           make package THEOS_PACKAGE_SCHEME=rootless IPA=Payload/YouTube.app FINALPACKAGE=1 ADDITIONAL_CFLAGS="-Wno-error -Wno-incompatible-pointer-types -I$(pwd)/headers"
           
