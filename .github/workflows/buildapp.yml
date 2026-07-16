@@ -155,17 +155,17 @@ jobs:
           # 1. 移除嚴格警告中斷
           find . -type f \( -name "Makefile" -o -name "*.mk" \) -exec sed -i '' 's/-Werror//g' {} +
           
-          # 2. 自動打補丁：修復 Return-YouTube-Dislikes
+          # 2. 自動打補丁：修復 Return-YouTube-Dislikes 模組 (加入缺失的 Foundation 與 assert.h)
           find Tweaks/Return-YouTube-Dislikes -type f \( -name "*.x" -o -name "*.xm" -o -name "*.m" \) -exec sh -c 'printf "#import <Foundation/Foundation.h>\n#include <assert.h>\n" | cat - "$1" > "$1.tmp" && mv "$1.tmp" "$1"' _ {} \;
           
-          # 3. 自動打補丁：修復 YouPiP
+          # 3. 自動打補丁：修復 YouPiP 模組 Logos 編譯器 Bug (缺少右括號)
           find Tweaks/YouPiP -name "LegacyPiPCompat.x" -exec sed -i '' -E 's/return initPlayerPiPControllerIfNeeded\((%orig.*)\);/id temp = \1; return initPlayerPiPControllerIfNeeded(temp);/g' {} +
           
-          # 4. 自動打補丁：修復 YTVideoOverlay
+          # 4. 自動打補丁：修復 YTVideoOverlay 模組 Logos 編譯器 Bug (缺少右括號)
           find Tweaks/YTVideoOverlay -name "Tweak.x" -exec sed -i '' -E 's/return topControls\(self, (%orig.*)\);/id temp = \1; return topControls(self, temp);/g' {} +
           
-          # 5. 自動打補丁 (終極無敵版)：修復 YouTube-X，不受空格影響，精準替換
-          find Tweaks/YouTube-X -name "Tweak.x" -exec sed -i '' 's/%orig(nil)/context = nil; %orig(context)/g' {} +
+          # 5. 自動打補丁 (真・終極版)：使用 perl 重寫 YouTube-X 錯誤程式碼，強制換行避開 Logos 貪婪吃字 Bug
+          find Tweaks/YouTube-X -name "Tweak.x" -exec perl -pi -e 's/.*decorateContext.*%orig\(nil\).*/- (void)decorateContext:(id)context {\n    context = nil;\n    %orig;\n}/' {} +
 
           # 6. 開啟寬容模式並進行編譯
           export GO_EASY_ON_ME=1
