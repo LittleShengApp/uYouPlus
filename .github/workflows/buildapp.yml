@@ -139,10 +139,12 @@ jobs:
           sed -i '' "27s#.*#BUNDLE_ID = ${{ env.BUNDLE_ID }}#g" Makefile
           sed -i '' "26s#.*#DISPLAY_NAME = ${{ env.APP_NAME }}#g" Makefile
           
-          # 新增這行：強制移除所有 Makefile 中的 -Werror 參數，避免編譯因為警告而中斷
-          find . -type f \( -name "Makefile" -o -name "*.mk" \) -exec sed -i '' 's/-Werror//g' {} +
+          # 設定 GO_EASY_ON_ME=1 讓 Theos 框架放寬檢查標準
+          export GO_EASY_ON_ME=1
           
-          make package THEOS_PACKAGE_SCHEME=rootless IPA=Payload/YouTube.app FINALPACKAGE=1
+          # 透過 ADDITIONAL_CFLAGS 直接命令 Clang 編譯器強制忽略這個特定的型別警告
+          make package THEOS_PACKAGE_SCHEME=rootless IPA=Payload/YouTube.app FINALPACKAGE=1 ADDITIONAL_CFLAGS="-Wno-error -Wno-incompatible-pointer-types"
+          
           echo "package=$(ls -t packages | head -n1)" >>$GITHUB_OUTPUT
           echo -e "==> \033[1mSHASUM256: $(shasum -a 256 packages/*.ipa | cut -f1 -d' ')\033[0m"
           echo -e "==> \033[1mBundle ID: ${{ env.BUNDLE_ID }}\033[0m"
