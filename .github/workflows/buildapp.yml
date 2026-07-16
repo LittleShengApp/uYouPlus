@@ -131,13 +131,19 @@ jobs:
           THEOS: ${{ github.workspace }}/theos
           YOUTUBE_URL: ${{ inputs.decrypted_youtube_url }}
 
-      - name: Download YouTube Headers
+      # 將步驟名稱改為 Download Missing Headers，並同時下載 YouTubeHeader 與 PSHeader
+      - name: Download Missing Headers
         run: |
           cd ${{ github.workspace }}/main
-          # 修正了這裡的網址與資料夾名稱
-          git clone --depth=1 https://github.com/PoomSmart/YouTubeHeader.git
           mkdir -p headers
+          
+          # 下載 YouTubeHeader
+          git clone --depth=1 https://github.com/PoomSmart/YouTubeHeader.git
           mv YouTubeHeader headers/YouTubeHeader
+          
+          # 下載 PSHeader
+          git clone --depth=1 https://github.com/PoomSmart/PSHeader.git
+          mv PSHeader headers/PSHeader
 
       - name: Fix compiling & Build Package
         id: build_package
