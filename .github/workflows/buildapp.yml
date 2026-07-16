@@ -131,13 +131,13 @@ jobs:
           THEOS: ${{ github.workspace }}/theos
           YOUTUBE_URL: ${{ inputs.decrypted_youtube_url }}
 
-      # 新增此步驟：下載缺失的 YouTube 頭文件 (Missing dependency)
       - name: Download YouTube Headers
         run: |
           cd ${{ github.workspace }}/main
-          git clone --depth=1 https://github.com/PoomSmart/YTHeaders.git
+          # 修正了這裡的網址與資料夾名稱
+          git clone --depth=1 https://github.com/PoomSmart/YouTubeHeader.git
           mkdir -p headers
-          mv YTHeaders headers/YouTubeHeader
+          mv YouTubeHeader headers/YouTubeHeader
 
       - name: Fix compiling & Build Package
         id: build_package
@@ -154,10 +154,6 @@ jobs:
           export GO_EASY_ON_ME=1
           
           # Use ADDITIONAL_CFLAGS to command the Clang compiler directly.
-          # -Wno-error suppresses treating warnings as errors.
-          # -Wno-incompatible-pointer-types suppresses the previous type warning.
-          # -I$(pwd)/headers tells the compiler to look for headers in the 'headers' folder, 
-          # which resolves the '<YouTubeHeader/YTIIcon.h>' path to 'headers/YouTubeHeader/YTIIcon.h'.
           make package THEOS_PACKAGE_SCHEME=rootless IPA=Payload/YouTube.app FINALPACKAGE=1 ADDITIONAL_CFLAGS="-Wno-error -Wno-incompatible-pointer-types -I$(pwd)/headers"
           
           echo "package=$(ls -t packages | head -n1)" >>$GITHUB_OUTPUT
