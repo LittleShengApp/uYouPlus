@@ -131,7 +131,6 @@ jobs:
           THEOS: ${{ github.workspace }}/theos
           YOUTUBE_URL: ${{ inputs.decrypted_youtube_url }}
 
-      # 將步驟名稱改為 Download Missing Headers，並同時下載 YouTubeHeader 與 PSHeader
       - name: Download Missing Headers
         run: |
           cd ${{ github.workspace }}/main
@@ -153,13 +152,14 @@ jobs:
           sed -i '' "27s#.*#BUNDLE_ID = ${{ env.BUNDLE_ID }}#g" Makefile
           sed -i '' "26s#.*#DISPLAY_NAME = ${{ env.APP_NAME }}#g" Makefile
           
-          # Force remove all -Werror parameters in Makefile to prevent build from being interrupted by warnings
+          # 1. 移除嚴格警告中斷
           find . -type f \( -name "Makefile" -o -name "*.mk" \) -exec sed -i '' 's/-Werror//g' {} +
           
-          # Enable GO_EASY_ON_ME mode for the Theos framework to relax check standards
-          export GO_EASY_ON_ME=1
+          # 2. 自動打補丁：為 Return-YouTube-Dislikes 模組的所有原始碼，強制在開頭加入缺失的 Foundation 與 assert.h 引入
+          find Tweaks/Return-YouTube-Dislikes -type f \( -name "*.x" -o -name "*.xm" -o -name "*.m" \) -exec sh -c 'printf "#import <Foundation/Foundation.h>\n#include <assert.h>\n" | cat - "$1" > "$1.tmp" && mv "$1.tmp" "$1"' _ {} \;
           
-          # Use ADDITIONAL_CFLAGS to command the Clang compiler directly.
+          # 3. 開啟寬容模式並進行編譯
+          export GO_EASY_ON_ME=1
           make package THEOS_PACKAGE_SCHEME=rootless IPA=Payload/YouTube.app FINALPACKAGE=1 ADDITIONAL_CFLAGS="-Wno-error -Wno-incompatible-pointer-types -I$(pwd)/headers"
           
           echo "package=$(ls -t packages | head -n1)" >>$GITHUB_OUTPUT
